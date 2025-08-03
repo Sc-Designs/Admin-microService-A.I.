@@ -7,6 +7,7 @@ import { validationResult } from "express-validator";
 import crypto from 'crypto';
 import adminModel from '../models/admin.model.js';
 import RegisterAdminService from '../services/admin.service.js';
+import cleanUpAdmin from '../utils/cleanUpAdmin.js';
 
 
 const register = async (req,res)=>{
@@ -140,4 +141,21 @@ const Stats = async (req,res)=>{
     });
 }
 
-export { login, Stats, register, verifyOtp };
+const GetProfile = async (req, res) => {
+  console.log("req come here!")
+  const admin = await adminFinder({
+    key: "_id",
+    query: req.admin._id,
+    lean: true,
+  });
+  if (!admin) {
+    return res.status(404).json({ message: "Admin not found" })
+  }
+
+  const adminCleaned = cleanUpAdmin(admin, true);
+
+  return res.status(200).json({
+    admin: adminCleaned});
+};
+
+export { login, Stats, register, verifyOtp, GetProfile };

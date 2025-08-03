@@ -15,9 +15,7 @@ app.use(cookieParser());
 connectWithRetry();
 
 
-app.use(cors({
-    origin : "*"
-}));
+app.use(cors());
 
 app.use("/", adminRouter)
 

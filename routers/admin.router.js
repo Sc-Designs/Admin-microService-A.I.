@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { login, Stats, register, verifyOtp } from "../controllers/admin.controller.js";
+import { login, Stats, register, verifyOtp, GetProfile } from "../controllers/admin.controller.js";
 import tryCatch from "../utils/tryCatch.js";
 import { body } from "express-validator";
 import logerAuthenticate from "../middlewares/isAdminLoggedIn.js";
@@ -40,6 +40,7 @@ router.post(
   ],
   tryCatch(verifyOtp)
 );
+router.get("/profile", logerAuthenticate, tryCatch(GetProfile));
 
 router.get("/stats", logerAuthenticate, tryCatch(Stats));
 

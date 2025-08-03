@@ -19,15 +19,15 @@ const logerAuthenticate = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_KEY);
-    const user = await adminFinder({
+    const admin = await adminFinder({
       key: "_id",
       query: decoded.id,
       lean: true,
     });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    if (!admin) {
+      return res.status(404).json({ error: "Admin not found" });
     }
-    req.user = user;
+    req.admin = admin;
     return next();
   } catch (error) {
     console.log(error);
