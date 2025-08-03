@@ -1,5 +1,3 @@
-import fetchUserStats from '../services/FetchUser.service.js';
-import fetchOrgStats from '../services/FetchOrg.service.js';
 import adminFinder from '../utils/adminFinder.js';
 import createOtp from '../utils/otpMaker.js';
 import sendEmail from '../utils/EmailSender.js';
@@ -8,6 +6,8 @@ import crypto from 'crypto';
 import adminModel from '../models/admin.model.js';
 import RegisterAdminService from '../services/admin.service.js';
 import cleanUpAdmin from '../utils/cleanUpAdmin.js';
+import fetchOrgStats from '../services/FetchOrg.service.js';
+import fetchUserStats from '../services/FetchUser.service.js';
 
 
 const register = async (req,res)=>{
@@ -102,10 +102,17 @@ const verifyOtp = async (req, res) => {
   });
 };
 
-const Stats = async (req,res)=>{
+const Stats = async (req, res) => {
+  try {
+    const { filter } = req.query;
+
+    if (!["Weekly", "Monthly", "Yearly"].includes(filter)) {
+      return res.status(400).json({ error: "Invalid filter value" });
+    }
+
     const [userStats, orgStats] = await Promise.all([
-      fetchUserStats(filter),
-      fetchOrgStats(filter),
+      fetchUserStats(filter, req.token),
+      fetchOrgStats(filter, req.token),
     ]);
 
     const format = (data) => {
@@ -139,10 +146,14 @@ const Stats = async (req,res)=>{
       userData: alignData(userFormatted, allLabels),
       orgData: alignData(orgFormatted, allLabels),
     });
-}
+  } catch (error) {
+    console.error("Stats fetch error:", error);
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
+};
+
 
 const GetProfile = async (req, res) => {
-  console.log("req come here!")
   const admin = await adminFinder({
     key: "_id",
     query: req.admin._id,

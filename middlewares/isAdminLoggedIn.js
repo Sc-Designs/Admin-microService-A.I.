@@ -28,6 +28,7 @@ const logerAuthenticate = async (req, res, next) => {
       return res.status(404).json({ error: "Admin not found" });
     }
     req.admin = admin;
+    req.token = token;
     return next();
   } catch (error) {
     console.log(error);
