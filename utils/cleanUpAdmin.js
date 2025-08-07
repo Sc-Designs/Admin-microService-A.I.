@@ -4,7 +4,6 @@ const cleanUpAdmin = (admin, lean = false) => {
     password,
     updatedAt,
     __v,
-    _id,
     otp,
     otpExpiry,
     avtarProfileId,

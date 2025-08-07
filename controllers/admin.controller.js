@@ -96,9 +96,8 @@ const verifyOtp = async (req, res) => {
   await admin.save();
   const token = admin.generateToken();
   res.json({
-    message: "OTP verified successfully",
     token,
-    admin
+    admin: cleanUpAdmin(admin),
   });
 };
 
@@ -163,10 +162,10 @@ const GetProfile = async (req, res) => {
     return res.status(404).json({ message: "Admin not found" })
   }
 
-  const adminCleaned = cleanUpAdmin(admin, true);
 
   return res.status(200).json({
-    admin: adminCleaned});
+    admin: cleanUpAdmin(admin, true),
+  });
 };
 
 export { login, Stats, register, verifyOtp, GetProfile };
