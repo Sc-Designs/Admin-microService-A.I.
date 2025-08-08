@@ -113,7 +113,6 @@ const Stats = async (req, res) => {
       fetchUserStats(filter, req.token),
       fetchOrgStats(filter, req.token),
     ]);
-
     const format = (data) => {
       return data.map((d) => {
         if (d._id.week)
@@ -124,8 +123,8 @@ const Stats = async (req, res) => {
       });
     };
 
-    const userFormatted = format(userStats);
-    const orgFormatted = format(orgStats);
+    const userFormatted = format(userStats.result);
+    const orgFormatted = format(orgStats.result);
 
     const allLabels = [
       ...new Set([
@@ -143,6 +142,8 @@ const Stats = async (req, res) => {
     res.json({
       labels: allLabels,
       userData: alignData(userFormatted, allLabels),
+      userCount: userStats.count,
+      orgCount: orgStats.count,
       orgData: alignData(orgFormatted, allLabels),
     });
   } catch (error) {
