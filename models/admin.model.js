@@ -28,11 +28,11 @@ const AdminSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    avatar: {
+    profileImage: {
       type: String,
       default: "",
     },
-    avtarProfileId: {
+    profileImagePublicId: {
       type: String,
       default: "",
     },
@@ -42,6 +42,10 @@ const AdminSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    phoneNumber: {
+      type: Number,
+      default: null,
     },
   },
   {

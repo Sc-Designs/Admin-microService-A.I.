@@ -8,6 +8,9 @@ import RegisterAdminService from '../services/admin.service.js';
 import cleanUpAdmin from '../utils/cleanUpAdmin.js';
 import fetchOrgStats from '../services/FetchOrg.service.js';
 import fetchUserStats from '../services/FetchUser.service.js';
+import redisClient from '../services/redis.service.js';
+import { v2 as cloudinary } from "cloudinary";
+import { uploadImage } from "../db/cloudinary-connection.js";
 
 
 const register = async (req,res)=>{
@@ -169,4 +172,58 @@ const GetProfile = async (req, res) => {
   });
 };
 
-export { login, Stats, register, verifyOtp, GetProfile };
+const logOut = async (req, res) => {
+  const token = req.token;
+  redisClient.set(token, "logout", "EX", 60 * 60 * 24);
+  res.status(200).json("LogOut successfully.");
+};
+
+const profileEdit = async (req, res) => {
+  const { name, number, currentPassword, confirmPassword } = req.body;
+  const File = req.file;
+  const admin = await adminFinder({
+    key: "email",
+    query: req.admin.email,
+    includePassword: true,
+  });
+  let avatarUrl = admin.profileImage;
+  let avatarPublicId = admin.profileImagePublicId;
+  if (File) {
+    try {
+      if (avatarPublicId) {
+        await cloudinary.uploader.destroy(avatarPublicId);
+      }
+      const result = await uploadImage(File.buffer, {
+        public_id: `admin_${admin._id}_profilePic`,
+        folder: "admin/ProfilePic",
+      });
+      avatarUrl = result.secure_url;
+      avatarPublicId = result.public_id;
+    } catch (err) {
+      console.error("Cloudinary upload failed:", err);
+      return res.status(500).json({ message: "Image upload failed" });
+    }
+  }
+
+  if (avatarUrl) admin.profileImage = avatarUrl;
+  if (number) admin.phoneNumber = number;
+  if (name) admin.name = name;
+  if (avatarPublicId) admin.profileImagePublicId = avatarPublicId;
+
+  if (currentPassword && confirmPassword) {
+    const isMatch = await admin.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+    const hashedPassword = await Organization.hashPassword(confirmPassword);
+    admin.password = hashedPassword;
+  }
+
+  await admin.save();
+  return res.status(200).json({
+    message: "Profile updated successfully",
+    admin: cleanUpAdmin(admin),
+  });
+};
+
+export { login, Stats, register, verifyOtp,profileEdit, GetProfile, logOut };

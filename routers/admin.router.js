@@ -1,9 +1,12 @@
 import express from "express";
-const router = express.Router();
-import { login, Stats, register, verifyOtp, GetProfile } from "../controllers/admin.controller.js";
+import { login, Stats, register, verifyOtp, GetProfile, profileEdit, logOut } from "../controllers/admin.controller.js";
 import tryCatch from "../utils/tryCatch.js";
 import { body } from "express-validator";
+import multer from "multer";
 import logerAuthenticate from "../middlewares/isAdminLoggedIn.js";
+
+const router = express.Router();
+const upload = multer();
 
 router.post(
   "/register",
@@ -43,5 +46,14 @@ router.post(
 router.get("/profile", logerAuthenticate, tryCatch(GetProfile));
 
 router.get("/stats", logerAuthenticate, tryCatch(Stats));
+
+router.post("/logout", logerAuthenticate, tryCatch(logOut));
+
+router.patch(
+  "/edit",
+  logerAuthenticate,
+  upload.single("avatar"),
+  tryCatch(profileEdit)
+);
 
 export default router;
