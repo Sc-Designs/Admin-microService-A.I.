@@ -17,7 +17,10 @@ connectWithRetry();
 
 app.use(cors());
 
-app.use("/", adminRouter)
+app.use("/",(req, res)=>{
+  res.send("Health Check");
+});
+app.use("/api", adminRouter)
 
 
 const PORT = process.env.PORT || 3000;
