@@ -17,7 +17,7 @@ connectWithRetry();
 
 app.use(cors());
 
-app.use("/",(req, res)=>{
+app.get("/",(req, res)=>{
   res.send("Health Check");
 });
 app.use("/api", adminRouter)
