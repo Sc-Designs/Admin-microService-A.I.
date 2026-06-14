@@ -116,6 +116,7 @@ const Stats = async (req, res) => {
       fetchUserStats(filter, req.token),
       fetchOrgStats(filter, req.token),
     ]);
+    console.log("Stats fetched:", { userStats, orgStats });
     const format = (data) => {
       return data.map((d) => {
         if (d._id.week)

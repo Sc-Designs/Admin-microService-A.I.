@@ -3,7 +3,7 @@ import axios from "axios";
 const fetchUserStats = async (filter = "weekly", token) => {
   try {
     const response = await axios.get(
-      `${process.env.USER_SERVICE_BASE_URL}/analytics?filter=${filter}`,
+      `${process.env.USER_SERVICE_BASE_URL}/api/analytics?filter=${filter}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
